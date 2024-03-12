@@ -1,0 +1,21 @@
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+scikit-learn
+imblearn
+xgboost
+catboost
+openpyxl
+ipykernel
+flask
+dill
+nbformat
+dvc
+mlflow
+python-dotenv
+mysql-connector-python
+pymysql
+
+-e .
