@@ -11,12 +11,12 @@
 - delete artifacts 
 - git add . 
 - git status 
-- git commit -m "first" 
+- git commit -m "git untrack" 
 - git push origin main 
-- python app.py 
+- python main.py 
 - dvc add artifacts/raw.csv 
 - git add . 
-- git commit 
+- git commit -m "dvc track" 
 - git push. 
 - git logs 
 - git checkout adddcommitnumber.
