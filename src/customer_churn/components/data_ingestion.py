@@ -20,7 +20,7 @@ class DataIngestion:
         self.ingestion_config = DataIngestionConfig()
 
     def initiate_data_ingestion(self):
-        logging.info("Entered the Data Ingestion...............")
+        logging.info("Entered the Data Ingestion")
         try:
             #df = pd.read_csv("notebook/data/EDA.csv")
             df = read_sql_data()

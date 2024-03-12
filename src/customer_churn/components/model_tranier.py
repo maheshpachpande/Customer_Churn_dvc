@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import mlflow
 from dataclasses import dataclass
 from catboost import CatBoostClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier, RandomForestClassifier
@@ -12,8 +13,9 @@ from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from src.customer_churn.exception import CustomException
 from src.customer_churn.logger import logging
-from src.customer_churn.utils import save_object, evaluate_model
+from src.customer_churn.utils import save_object, evaluate_model, eval_metrics
 from imblearn.combine import SMOTEENN
+from urllib.parse import urlparse
 
 
 @dataclass
@@ -97,6 +99,47 @@ class ModelTrainer:
             ]
 
             best_model = models[best_model_name]
+
+            print("This is the Best Model: ")
+            print(best_model_name)
+
+            model_names = list(params.keys())
+
+            actual_model = ""
+
+            for model in model_names:
+                if best_model_name==model:
+                    actual_model=actual_model+model
+
+            best_params = params[actual_model]
+
+            mlflow.set_registry_uri("https://dagshub.com/pachpandemahesh300/Customer_Churn_dvc.mlflow")
+            tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+
+            #mlFlow
+            
+            with mlflow.start_run():
+
+                predicted_qualities = best_model.predict(X_test)
+
+                accuracy, class_report, confusionmatrix = eval_metrics(y_test, predicted_qualities)
+
+                mlflow.log_params(best_params)
+
+                mlflow.log_metric("accuracy", accuracy)
+                # mlflow.log_metric("class_report", class_report)
+                # mlflow.log_metric("confusionmatrix", confusionmatrix)
+
+                # Model registry does not work with file store
+                if tracking_url_type_store != "file":
+
+                    # Register the model
+                    # There are other ways to use the Model Registry, which depends on the use case,
+                    # please refer to the doc for more information:
+                    # https://mlflow.org/docs/latest/model-registry.html#api-workflow
+                    mlflow.sklearn.log_model(best_model, "model", registered_model_name=actual_model)
+                else:
+                    mlflow.sklearn.log_model(best_model, "model")
 
             if best_model_score < 0.6:
                 raise CustomException("No Best Model Found......")

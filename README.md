@@ -22,3 +22,9 @@
 - git checkout adddcommitnumber.
 
 #### mlflow tracking
+- export MLFLOW_TRACKING_URI=https://dagshub.com/pachpandemahesh300/Customer_Churn_dvc.mlflow \
+- export MLFLOW_TRACKING_USERNAME=pachpandemahesh300 \
+- export MLFLOW_TRACKING_PASSWORD=9f73334e82cb0e1dc7693e6eed2b0827c86e8db9 \
+- python script.py
+
+#### 

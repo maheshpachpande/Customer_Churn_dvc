@@ -2,8 +2,9 @@ import os
 import sys
 import dill
 import pandas as pd
+import numpy as np
 import pymysql
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import GridSearchCV
 from src.customer_churn.exception import CustomException
 from src.customer_churn.logger import logging
@@ -30,7 +31,7 @@ def read_sql_data():
             password=password,
             db=db
         )
-        logging.info("Connection Established",mydb)
+        #logging.info("Connection Established",mydb)
         df=pd.read_sql_query('select * from churn',mydb)
         print(df.head())
 
@@ -70,9 +71,14 @@ def evaluate_model(X_train, y_train, X_test, y_test, models, param):
 
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
+            y_pred = y_pred.round()
 
-            test_model_accuracy_score=accuracy_score(y_test, y_pred.round())
+            test_model_accuracy_score=accuracy_score(y_test, y_pred)
+            # test_model_classification_report=classification_report(y_test, y_pred)
+            # test_model_confusion_matrix=confusion_matrix(y_test, y_pred)
             report[list(models.keys())[i]]=test_model_accuracy_score
+            # report[list(models.keys())[i]]=test_model_classification_report
+            # report[list(models.keys())[i]]=test_model_confusion_matrix
 
         return report
 
@@ -88,3 +94,9 @@ def load_object(file_path):
 
     except Exception as e:
         raise CustomException(e, sys)
+    
+def eval_metrics(actual, pred):
+        accuracy = accuracy_score(actual, pred)
+        class_report = classification_report(actual, pred)
+        confusionmatrix = confusion_matrix(actual, pred)
+        return accuracy, class_report, confusionmatrix
